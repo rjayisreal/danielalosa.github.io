@@ -7,20 +7,16 @@
 <title>Birthday Letter 💌</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
-
 body {
     margin: 0;
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
     background: linear-gradient(135deg, #ff416c, #ff4b2b);
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: Arial;
     overflow: hidden;
+    padding: 20px;
 }
 
 /* PASSWORD SCREEN */
@@ -28,72 +24,62 @@ body {
     position: absolute;
     text-align: center;
     color: white;
-    width: 100%;
-    padding: 20px;
 }
 
 .password-screen input {
-    padding: 12px;
-    width: 70%;
-    max-width: 250px;
+    padding: 10px;
     border: none;
     border-radius: 8px;
     margin-top: 10px;
     text-align: center;
-    font-size: 16px;
 }
 
 .password-screen button {
-    padding: 12px 25px;
+    padding: 10px 20px;
     border: none;
     border-radius: 8px;
     margin-top: 10px;
     background: white;
     cursor: pointer;
-    font-size: 16px;
 }
 
-/* WRAPPER (TRUE CENTER FIX) */
+/* wrapper */
 .wrapper {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
     text-align: center;
+    display: none;
 }
 
-/* ENVELOPE */
+/* envelope */
 .envelope {
-    width: clamp(140px, 40vw, 200px);
-    height: clamp(100px, 30vw, 150px);
+    width: 180px;
+    height: 130px;
+    max-width: 80vw;
     background: #fff;
     position: relative;
     cursor: pointer;
     border-radius: 10px;
-    margin: auto;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    transition: 0.6s;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+    z-index: 2;
 }
 
-/* FLAP */
+/* flap */
 .envelope::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
-    width: 0;
-    height: 0;
-    border-left: 100px solid transparent;
-    border-right: 100px solid transparent;
+    border-left: 90px solid transparent;
+    border-right: 90px solid transparent;
     border-top: 70px solid #ff6f61;
     transform-origin: top;
-    transition: 0.6s;
+    transition: transform 0.6s ease;
 }
 
-/* TAP TEXT */
+/* CLICK ME */
 .envelope::after {
-    content: "👆 Tap me";
+    content: "👆 Click me";
     position: absolute;
     bottom: -35px;
     left: 50%;
@@ -104,6 +90,7 @@ body {
     padding: 5px 10px;
     border-radius: 20px;
     animation: pulse 1.5s infinite;
+    white-space: nowrap;
 }
 
 @keyframes pulse {
@@ -112,44 +99,38 @@ body {
     100% { transform: translateX(-50%) scale(1); }
 }
 
-/* LETTER (ALWAYS CENTERED) */
+/* LETTER */
 .letter {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
-    width: 90%;
+    transform: translate(-50%, -50%) scale(0.3);
+    width: 92%;
     max-width: 420px;
-    padding: 20px;
+    padding: 25px;
     background: rgba(255,255,255,0.97);
     border-radius: 18px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
     opacity: 0;
-    transition: 0.6s;
+    transition: 0.7s ease;
+    z-index: 1;
     text-align: center;
 }
 
 /* PHOTO */
 .photo {
-    width: clamp(100px, 30vw, 160px);
-    height: clamp(100px, 30vw, 160px);
+    width: 160px;
+    height: 160px;
+    max-width: 60vw;
     border-radius: 50%;
+    border: 5px solid white;
     object-fit: cover;
     margin-top: 15px;
 }
 
-/* TEXT */
-h2 {
-    font-size: clamp(18px, 5vw, 24px);
-}
-
-p {
-    font-size: clamp(14px, 4vw, 16px);
-}
-
 /* OPEN STATE */
 .wrapper.open .envelope {
-    transform: translateY(-40px);
+    transform: translateY(-50px);
     opacity: 0;
 }
 
@@ -222,12 +203,8 @@ const wrapper = document.getElementById("wrapper");
 const canvas = document.getElementById("effects");
 const ctx = canvas.getContext("2d");
 
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 let confetti = [];
 let fireworks = [];
@@ -238,11 +215,12 @@ wrapper.addEventListener("click", () => {
     startFireworks();
 });
 
+/* CONFETTI */
 function startConfetti() {
     for (let i = 0; i < 150; i++) {
         confetti.push({
             x: Math.random() * canvas.width,
-            y: Math.random() * -canvas.height,
+            y: Math.random() * canvas.height - canvas.height,
             size: Math.random() * 6 + 4,
             speed: Math.random() * 3 + 2,
             color: `hsl(${Math.random()*360},100%,50%)`
@@ -250,22 +228,34 @@ function startConfetti() {
     }
 }
 
+/* FIREWORKS */
 function startFireworks() {
     setInterval(() => {
         fireworks.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height / 2,
-            particles: Array.from({length:30}, () => ({
-                angle: Math.random() * Math.PI * 2,
-                life: 60
-            }))
+            particles: createParticles()
         });
     }, 800);
 }
 
+function createParticles() {
+    let particles = [];
+    for (let i = 0; i < 30; i++) {
+        particles.push({
+            angle: Math.random() * Math.PI * 2,
+            speed: Math.random() * 5,
+            life: 60
+        });
+    }
+    return particles;
+}
+
+/* ANIMATION LOOP */
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // confetti
     confetti.forEach(c => {
         c.y += c.speed;
         if (c.y > canvas.height) c.y = 0;
@@ -273,6 +263,7 @@ function animate() {
         ctx.fillRect(c.x, c.y, c.size, c.size);
     });
 
+    // fireworks
     fireworks.forEach(f => {
         f.particles.forEach(p => {
             let x = f.x + Math.cos(p.angle) * (60 - p.life);
