@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Birthday Letter 💌</title>
+
+<style>
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial;
+    overflow: hidden;
+    padding: 20px;
+}
+
+/* PASSWORD SCREEN */
+.password-screen {
+    position: absolute;
+    text-align: center;
+    color: white;
+}
+
+.password-screen input {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.password-screen button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    background: white;
+    cursor: pointer;
+}
+
+/* wrapper */
+.wrapper {
+    position: relative;
+    text-align: center;
+    display: none;
+}
+
+/* envelope */
+.envelope {
+    width: 180px;
+    height: 130px;
+    max-width: 80vw;
+    background: #fff;
+    position: relative;
+    cursor: pointer;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transition: transform 0.6s ease, opacity 0.6s ease;
+    z-index: 2;
+}
+
+/* flap */
+.envelope::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-left: 90px solid transparent;
+    border-right: 90px solid transparent;
+    border-top: 70px solid #ff6f61;
+    transform-origin: top;
+    transition: transform 0.6s ease;
+}
+
+/* CLICK ME */
+.envelope::after {
+    content: "👆 Click me";
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: white;
+    background: rgba(0,0,0,0.3);
+    padding: 5px 10px;
+    border-radius: 20px;
+    animation: pulse 1.5s infinite;
+    white-space: nowrap;
+}
+
+@keyframes pulse {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.1); }
+    100% { transform: translateX(-50%) scale(1); }
+}
+
+/* LETTER */
+.letter {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.3);
+    width: 92%;
+    max-width: 420px;
+    padding: 25px;
+    background: rgba(255,255,255,0.97);
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: 0.7s ease;
+    z-index: 1;
+    text-align: center;
+}
+
+/* PHOTO */
+.photo {
+    width: 160px;
+    height: 160px;
+    max-width: 60vw;
+    border-radius: 50%;
+    border: 5px solid white;
+    object-fit: cover;
+    margin-top: 15px;
+}
+
+/* OPEN STATE */
+.wrapper.open .envelope {
+    transform: translateY(-50px);
+    opacity: 0;
+}
+
+.wrapper.open .envelope::before {
+    transform: rotateX(180deg);
+}
+
+.wrapper.open .letter {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.wrapper.open .envelope::after {
+    display: none;
+}
+
+/* CANVAS */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="password-screen" id="passwordScreen">
+    <h2>Enter Your Birthday 🎂</h2>
+    <input type="text" id="passwordInput" placeholder="MMDDYYYY">
+    <br>
+    <button onclick="checkPassword()">Open</button>
+    <p id="error" style="color: yellow;"></p>
+</div>
+
+<div class="wrapper" id="wrapper">
+    <div class="envelope"></div>
+
+    <div class="letter">
+        <h2>🎉 Happy Birthday Love! 🎉</h2>
+        <img src="photo.jpg" class="photo">
+        <p>
+            Happy birthday, my love. Wishing you all the best in this world.
+            Baby and I love you so much. Enjoy your day. Mwah! 💖
+        </p>
+    </div>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="happybirthday.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="effects"></canvas>
+
+<script>
+function checkPassword() {
+    const input = document.getElementById("passwordInput").value;
+
+    if (input === "04202000") {
+        document.getElementById("passwordScreen").style.display = "none";
+        document.getElementById("wrapper").style.display = "block";
+        document.getElementById("bgMusic").play();
+    } else {
+        document.getElementById("error").textContent = "Wrong birthday 😢";
+    }
+}
+
+const wrapper = document.getElementById("wrapper");
+const canvas = document.getElementById("effects");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confetti = [];
+let fireworks = [];
+
+wrapper.addEventListener("click", () => {
+    wrapper.classList.add("open");
+    startConfetti();
+    startFireworks();
+});
+
+/* CONFETTI */
+function startConfetti() {
+    for (let i = 0; i < 150; i++) {
+        confetti.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            size: Math.random() * 6 + 4,
+            speed: Math.random() * 3 + 2,
+            color: `hsl(${Math.random()*360},100%,50%)`
+        });
+    }
+}
+
+/* FIREWORKS */
+function startFireworks() {
+    setInterval(() => {
+        fireworks.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height / 2,
+            particles: createParticles()
+        });
+    }, 800);
+}
+
+function createParticles() {
+    let particles = [];
+    for (let i = 0; i < 30; i++) {
+        particles.push({
+            angle: Math.random() * Math.PI * 2,
+            speed: Math.random() * 5,
+            life: 60
+        });
+    }
+    return particles;
+}
+
+/* ANIMATION LOOP */
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // confetti
+    confetti.forEach(c => {
+        c.y += c.speed;
+        if (c.y > canvas.height) c.y = 0;
+        ctx.fillStyle = c.color;
+        ctx.fillRect(c.x, c.y, c.size, c.size);
+    });
+
+    // fireworks
+    fireworks.forEach(f => {
+        f.particles.forEach(p => {
+            let x = f.x + Math.cos(p.angle) * (60 - p.life);
+            let y = f.y + Math.sin(p.angle) * (60 - p.life);
+            ctx.fillStyle = "white";
+            ctx.fillRect(x, y, 2, 2);
+            p.life--;
+        });
+    });
+
+    fireworks = fireworks.filter(f => f.particles.some(p => p.life > 0));
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
